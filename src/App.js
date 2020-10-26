@@ -1,26 +1,51 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from 'react';
+import axios from 'axios';
 import './App.css';
+import { Grid, Button, TextField } from '@material-ui/core'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+const api = 'http://localhost:8080/api/greeting';
+
+class App extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      greeting: '',
+      name: ''
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentDidMount() {
+    this.hello();
+  }
+
+  async hello() {
+    const response = await axios.get(api);
+    this.setState({greeting: response.data});
+  }
+
+  handleChange(e) {
+    this.setState({name: e.target.value});
+  }
+
+  async handleSubmit() {
+    const response = await axios.post(`${api}?name=${this.state.name}`);
+    this.setState({greeting: response.data});
+  }
+
+  render() {
+    return (
+      <Grid container direction="column" alignItems="center" justify="center">
+        <h1>{this.state.greeting}</h1>
+        <TextField value={this.state.name} onChange={this.handleChange} placeholder="Name" />
+        <br/>
+        <Button variant="contained" color="primary" size="small" onClick={this.handleSubmit} disabled={!this.state.name}>Click Me</Button>
+      </Grid>
+    )
+  }
 }
 
 export default App;
